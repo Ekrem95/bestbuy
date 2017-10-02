@@ -1,12 +1,50 @@
 const express = require('express');
 const path = require('path');
+const bodyParser = require('body-parser');
+const logger = require('morgan');
+const session = require('express-session');
+const RedisStore = require('connect-redis')(session);
+const compression = require('compression');
+const dotenv = require('dotenv');
+
+dotenv.load();
 
 const app = express();
 
+app.use(compression());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(logger('dev'));
 app.use(express.static(path.join(__dirname, 'src/public')));
+app.set('trust proxy', 1); // trust first proxy
 
-app.get('/', (req, res) => {
-  res.sendFile('index.html');
+const hour = 3600000; //in seconds * 1000
+app.use(session({
+  secret: process.env.session,
+  resave: false,
+  saveUninitialized: true,
+  cookie: { path: '/', httpOnly: true, secure: false, maxAge: hour * 24 },
+  store: new RedisStore(),
+}));
+
+app.use('/', require('./router/router'));
+
+// app.get('/user', (req, res) => {
+//   if (req.session.views) {
+//     req.session.views++;
+//     res.setHeader('Content-Type', 'text/html');
+//     res.write('<p>views: ' + req.session.views + '</p>');
+//     res.write('<p>expires in: ' + (req.session.cookie.maxAge / 1000) + 's</p>');
+//     res.end();
+//   } else {
+//     req.session.views = 1;
+//     res.end('welcome to the session demo. refresh!');
+//   }
+// });
+
+const port = process.env.PORT || 3000;
+
+require('./setup')();
+app.listen(port, () => {
+  console.log(`Listening on port: ${port}`);
 });
-
-app.listen(process.env.PORT || 3000);
