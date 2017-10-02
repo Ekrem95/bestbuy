@@ -32,7 +32,7 @@ r.get('/eko', (req, res) => {
   res.sendFile(path.join(__dirname, '../src/public', 'index.html'));
 });
 
-r.get('/', (req, res) => {
+r.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../src/public', 'index.html'));
 });
 

@@ -1,8 +1,6 @@
 const { Client } = require('pg');
 const dotenv = require('dotenv');
 
-dotenv.load();
-
 const client = new Client({
   user: process.env.dbname,
   host: 'localhost',
@@ -17,10 +15,13 @@ module.exports = () => {
   client.query(`
     create table if not exists users(
       id int primary key not null,
-      name    text  not null,
-      age     int,
-      address char(50),
-      balance   int   not null
+      name     text  not null,
+      email    text  not null,
+      password text  not null,
+      age      int,
+      address  char(50),
+      balance  int   not null,
+      unique (email)
     );
   `)
     .then(() => null)
@@ -29,10 +30,11 @@ module.exports = () => {
       client.query(`
         create table if not exists items(
           id int primary key not null,
-          name   text    not null,
-          price  int     not null,
-          onsale boolean not null default true,
-          owner  text    not null
+          name    text    not null,
+          price   int     not null,
+          onsale  boolean not null default true,
+          ownerID int    not null,
+          tags    text[]
         );
       `)
       .then(() => null)
