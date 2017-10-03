@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { validateEmail } from '../JS/helpers';
+import { validateEmail, post } from '../JS/helpers';
 
 export default class Auth extends Component {
   constructor(props) {
@@ -41,6 +41,15 @@ export default class Auth extends Component {
       this.setState({ msg: 'Password must have at least 6 characters.' });
     } else {
       this.setState({ msg: null });
+      const body = { email, password };
+      fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(body),
+      });
     }
   }
 
@@ -60,6 +69,26 @@ export default class Auth extends Component {
       this.setState({ msg: 'Passwords do not match.' });
     } else {
       this.setState({ msg: null });
+      const body = { name, email, password };
+      fetch('/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(body),
+      })
+      .then(r => {
+        if (r.status === 200) {
+          this.props.history.push('/');
+        } else {
+          r.json()
+          .then(r => {
+            this.setState({ msg: r.msg });
+          });
+        }
+      })
+      .catch(e => console.log(e));
     }
   }
 

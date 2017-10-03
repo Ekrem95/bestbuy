@@ -14,13 +14,13 @@ module.exports = () => {
 
   client.query(`
     create table if not exists users(
-      id int primary key not null,
+      id serial primary key not null,
       name     text  not null,
       email    text  not null,
       password text  not null,
       age      int,
       address  char(50),
-      balance  int   not null,
+      balance  int   not null default 5000,
       unique (email)
     );
   `)
