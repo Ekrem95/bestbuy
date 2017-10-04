@@ -23,11 +23,6 @@ export default class Dashboard extends Component {
     return (
       <div>
         <div>Dashboard</div>
-        <div
-          onClick={() => {
-            this.props.history.push('/auth');
-          }}
-          >Auth</div>
       </div>
     );
   }

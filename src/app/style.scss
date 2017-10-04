@@ -5,10 +5,11 @@
   align-self: center
 }
 
-body {
+html, body {
   background: #000;
   color: #eee;
   font-size: 16px;
+  margin: 0;
 
   #auth {
     @include column;
@@ -49,5 +50,59 @@ body {
     p {
       align-self: center;
     }
+  }
+
+  #nav {
+    height: 30px;
+    width: 100vw;
+    background: rgb(204, 43, 130);
+    color: #eee;
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+
+    .links {
+      * {
+        color: #fff;
+        text-decoration: none;
+        cursor: pointer;
+        margin: 0 15px;
+      }
+    }
+  }
+
+  #addproduct {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+
+    div {
+      @include column;
+
+      * {
+        padding: 0 5px;
+      }
+
+      input{
+        margin: 6px;
+        border: none;
+        border-radius: 3px;
+        height: 26px;
+        width: 300px;
+        box-sizing: border-box;
+      }
+
+      input[type="button"] {
+        background: rgb(40, 144, 57);
+        color: #eee;
+
+        &:hover {
+          background: rgb(49, 168, 68);
+        }
+      }
+    }
+
   }
 }

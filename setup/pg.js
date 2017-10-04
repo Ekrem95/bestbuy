@@ -29,12 +29,25 @@ module.exports = () => {
     .then(() => {
       client.query(`
         create table if not exists items(
-          id int primary key not null,
-          name    text    not null,
-          price   int     not null,
-          onsale  boolean not null default true,
-          ownerID int    not null,
-          tags    text[]
+          id serial primary key not null,
+          name     text    not null,
+          price    int     not null,
+          onsale   boolean not null default true,
+          ownerID  int     not null,
+          quantity int     not null,
+          tags     text[]
+        );
+      `)
+      .then(() => null)
+      .catch(e => console.error(e.stack));
+    })
+    .catch(e => console.log(e))
+    .then(() => {
+      client.query(`
+        create table if not exists item_images(
+          id serial primary key not null,
+          src    text not null,
+          itemID int  not null
         );
       `)
       .then(() => null)

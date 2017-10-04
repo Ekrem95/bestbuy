@@ -21,6 +21,11 @@ r.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../src/public', 'index.html'));
 });
 
+r.post('/logout', (req, res) => {
+  req.session.destroy();
+  res.status(200).send();
+});
+
 r.post('/login', (req, res) => {
   if (req.body.email.length < 5 || req.body.password.length < 6) {
     res.status(400).json({ msg: 'Bad Request' });
@@ -30,7 +35,7 @@ r.post('/login', (req, res) => {
   pool.connect((err, client, done) => {
     if (err) throw err;
     client.query(
-      'SELECT name, password FROM users WHERE email = $1 limit 1',
+      'SELECT id, password FROM users WHERE email = $1 limit 1',
       [req.body.email], (err, rows) => {
       done();
 
@@ -53,7 +58,7 @@ r.post('/login', (req, res) => {
       }
 
       const token = jwt.sign({
-        name: rows.rows[0].name,
+        id: rows.rows[0].id,
       }, process.env.token, { expiresIn: 60 * 60 * 24 });
 
       res.status(200).json({
@@ -82,7 +87,6 @@ r.post('/signup', (req, res) => {
         return;
       }
 
-      // console.log(rows);
       if (rows.rowCount !== 0) {
         done();
         res.status(401).json({ msg: 'User with same email address already exists.' });
@@ -94,7 +98,7 @@ r.post('/signup', (req, res) => {
       delete req.body.password;
 
       client.query(
-        'insert into users (name, email, password) values ($1, $2, $3)',
+        'insert into users (name, email, password) values ($1, $2, $3) returning id',
         [req.body.name, req.body.email, hash], (err, rows) => {
         done();
         if (err) {
@@ -104,7 +108,7 @@ r.post('/signup', (req, res) => {
         }
 
         const token = jwt.sign({
-          name: rows.rows[0].name,
+          id: rows.rows[0].id,
         }, process.env.token, { expiresIn: 60 * 60 * 24 });
 
         res.status(200).json({
@@ -112,6 +116,49 @@ r.post('/signup', (req, res) => {
         });
       });
 
+    });
+  });
+});
+
+r.post('/upload-item', (req, res) => {
+  const token = req.get('Authorization');
+  jwt.verify(token, process.env.token, function (err, decoded) {
+    if (decoded === undefined) {
+      res.status(401).json({ msg: 'You are not authorized.' });
+      return;
+    }
+
+    const { name, price, quantity, tags, image } = req.body;
+
+    pool.connect((err, client, done) => {
+      if (err) throw err;
+      client.query(
+        `insert into items (name, price, ownerID, quantity, tags)
+         values ($1, $2, $3, $4, $5) returning id`,
+         [name, price, decoded.id, quantity, tags], (err, rows) => {
+        if (err) {
+          done();
+          console.log(err.stack);
+          res.status(500).json({ msg: 'Internal Server Error.' });
+          return;
+        }
+
+        const itemID = rows.rows[0].id;
+
+        client.query(
+          `insert into item_images (src, itemID)
+           values ($1, $2)`,
+           [image, itemID], (err, rows) => {
+            done();
+            if (err) {
+              console.log(err.stack);
+              res.status(500).json({ msg: 'Internal Server Error.' });
+              return;
+            }
+
+            res.status(200).send();
+          });
+      });
     });
   });
 });

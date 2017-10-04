@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { validateEmail, post } from '../JS/helpers';
+import { validateEmail } from '../JS/helpers';
+import axios from 'axios';
 
 export default class Auth extends Component {
   constructor(props) {
@@ -41,29 +42,17 @@ export default class Auth extends Component {
       this.setState({ msg: 'Password must have at least 6 characters.' });
     } else {
       this.setState({ msg: null });
-      const body = { email, password };
-      fetch('/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(body),
+
+      axios.post('/login', {
+        email, password,
       })
-      .then(r => {
-        if (r.status === 200) {
-          r.json().then(r => {
-            localStorage.setItem('token', r.token);
-            this.props.history.push('/');
-          });
-        } else {
-          r.json()
-          .then(r => {
-            this.setState({ msg: r.msg });
-          });
-        }
+      .then(res => {
+        localStorage.setItem('token', res.data.token);
+        this.props.history.push('/');
       })
-      .catch(e => console.log(e));
+      .catch(error => {
+        this.setState({ msg: error.response.data.msg });
+      });
     }
   }
 
@@ -83,29 +72,17 @@ export default class Auth extends Component {
       this.setState({ msg: 'Passwords do not match.' });
     } else {
       this.setState({ msg: null });
-      const body = { name, email, password };
-      fetch('/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(body),
+
+      axios.post('/signup', {
+        name, email, password,
       })
-      .then(r => {
-        if (r.status === 200) {
-          r.json().then(r => {
-            localStorage.setItem('token', r.token);
-            this.props.history.push('/');
-          });
-        } else {
-          r.json()
-          .then(r => {
-            this.setState({ msg: r.msg });
-          });
-        }
+      .then(res => {
+        localStorage.setItem('token', res.data.token);
+        this.props.history.push('/');
       })
-      .catch(e => console.log(e));
+      .catch(error => {
+        this.setState({ msg: error.response.data.msg });
+      });
     }
   }
 
