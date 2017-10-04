@@ -49,7 +49,21 @@ export default class Auth extends Component {
         },
         credentials: 'include',
         body: JSON.stringify(body),
-      });
+      })
+      .then(r => {
+        if (r.status === 200) {
+          r.json().then(r => {
+            localStorage.setItem('token', r.token);
+            this.props.history.push('/');
+          });
+        } else {
+          r.json()
+          .then(r => {
+            this.setState({ msg: r.msg });
+          });
+        }
+      })
+      .catch(e => console.log(e));
     }
   }
 
@@ -80,7 +94,10 @@ export default class Auth extends Component {
       })
       .then(r => {
         if (r.status === 200) {
-          this.props.history.push('/');
+          r.json().then(r => {
+            localStorage.setItem('token', r.token);
+            this.props.history.push('/');
+          });
         } else {
           r.json()
           .then(r => {

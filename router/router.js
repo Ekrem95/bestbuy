@@ -17,8 +17,56 @@ pool.on('error', (err, client) => {
   process.exit(-1);
 });
 
+r.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../src/public', 'index.html'));
+});
+
+r.post('/login', (req, res) => {
+  if (req.body.email.length < 5 || req.body.password.length < 6) {
+    res.status(400).json({ msg: 'Bad Request' });
+    return;
+  }
+
+  pool.connect((err, client, done) => {
+    if (err) throw err;
+    client.query(
+      'SELECT name, password FROM users WHERE email = $1 limit 1',
+      [req.body.email], (err, rows) => {
+      done();
+
+      if (err) {
+        console.log(err.stack);
+        return;
+      }
+
+      if (rows.rowCount === 0) {
+        res.status(401).json({ msg: 'User with this email address does not exists.' });
+        return;
+      }
+
+      const hash = rows.rows[0].password;
+      const match = bcrypt.compareSync(req.body.password, hash);
+
+      if (match === false) {
+        res.status(401).json({ msg: 'Wrong email & password combination.' });
+        return;
+      }
+
+      const token = jwt.sign({
+        name: rows.rows[0].name,
+      }, process.env.token, { expiresIn: 60 * 60 * 24 });
+
+      res.status(200).json({
+        token: token,
+      });
+    });
+  });
+});
+
 r.post('/signup', (req, res) => {
-  if (req.body.name < 1 || req.body.email < 5 || req.body.password < 6) {
+  if (req.body.name.length < 1 ||
+      req.body.email.length < 5 ||
+      req.body.password.length < 6) {
     res.status(400).json({ msg: 'Bad Request' });
     return;
   }
@@ -55,15 +103,17 @@ r.post('/signup', (req, res) => {
           return;
         }
 
-        res.status(200).json({ msg: 'Success.' });
+        const token = jwt.sign({
+          name: rows.rows[0].name,
+        }, process.env.token, { expiresIn: 60 * 60 * 24 });
+
+        res.status(200).json({
+          token: token,
+        });
       });
 
     });
   });
-});
-
-r.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../src/public', 'index.html'));
 });
 
 module.exports = r;
