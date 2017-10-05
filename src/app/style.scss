@@ -5,6 +5,11 @@
   align-self: center
 }
 
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 html, body {
   background: #000;
   color: #eee;
@@ -55,7 +60,7 @@ html, body {
   #nav {
     height: 30px;
     width: 100vw;
-    background: rgb(204, 43, 130);
+    background: rgb(43, 141, 204);
     color: #eee;
     display: flex;
     flex-flow: row;
@@ -115,6 +120,8 @@ html, body {
     min-width: 450px;
     margin: 0 auto;
 
+    animation: fadein 1s;
+
     img {
       width: 90px;
       max-height: 90px;
@@ -145,6 +152,44 @@ html, body {
         display: flex;
         flex-direction: row;
         align-items: center;
+      }
+    }
+  }
+
+  #lists {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    div {
+      margin: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+      width: 250px;
+      height: 300px;
+      border: solid 2px rgb(48, 30, 45);
+      cursor: pointer;
+
+      animation: fadein 1s;
+
+      &:hover {
+        background: rgb(26, 27, 24);
+      }
+
+      h4 {
+        max-width: 200px;
+      }
+
+      img {
+        width: 200px;
+        max-height: 250px;
+        object-fit: cover;
+      }
+
+      span {
+        margin: 10px;
       }
     }
   }

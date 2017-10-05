@@ -17,6 +17,11 @@ pool.on('error', (err, client) => {
   process.exit(-1);
 });
 
+r.get('/robots.txt', (req, res) => {
+    res.type('text/plain');
+    res.send('User-agent: *\nDisallow: /');
+  });
+
 r.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../src/public', 'index.html'));
 });
