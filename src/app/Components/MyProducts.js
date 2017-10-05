@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { checkAuth } from '../JS/helpers';
 
 export default class MyProducts extends Component {
   constructor() {
@@ -8,13 +9,17 @@ export default class MyProducts extends Component {
   }
 
   componentWillMount() {
-    axios.get('/api/myproducts', {
-      headers: { Authorization: localStorage.getItem('token') },
-    })
-    .then(res => {
-      this.setState({ items: res.data.items });
-    })
-    .catch(e => console.log(e.response.status));
+    checkAuth(this).then(loggedIn => {
+      if (loggedIn) {
+        axios.get('/api/myproducts', {
+          headers: { Authorization: localStorage.getItem('token') },
+        })
+        .then(res => {
+          this.setState({ items: res.data.items });
+        })
+        .catch(e => console.log(e.response.status));
+      }
+    });
   }
 
   render() {
