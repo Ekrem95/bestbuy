@@ -105,4 +105,47 @@ html, body {
     }
 
   }
+
+  #myproducts {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    max-width: 1050px;
+    min-width: 450px;
+    margin: 0 auto;
+
+    img {
+      width: 90px;
+      max-height: 90px;
+      object-fit: cover;
+    }
+
+    div.item {
+      max-width: 500px;
+      min-width: 400px;
+      width: 90vw;
+      border: 1px solid rgb(70, 70, 70);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      margin: 10px;
+      cursor: pointer;
+
+      &:hover {
+        background: #0d0808;
+      }
+
+      * {
+        margin: 5px 10px;
+      }
+
+      div {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      }
+    }
+  }
 }

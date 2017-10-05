@@ -128,14 +128,14 @@ r.post('/upload-item', (req, res) => {
       return;
     }
 
-    const { name, price, quantity, tags, image } = req.body;
+    const { name, price, quantity, tags, src } = req.body;
 
     pool.connect((err, client, done) => {
       if (err) throw err;
       client.query(
-        `insert into items (name, price, ownerID, quantity, tags)
-         values ($1, $2, $3, $4, $5) returning id`,
-         [name, price, decoded.id, quantity, tags], (err, rows) => {
+        `insert into items (name, price, quantity, owner_id)
+         values ($1, $2, $3, $4) returning id`,
+         [name, price, quantity, decoded.id], (err, rows) => {
         if (err) {
           done();
           console.log(err.stack);
@@ -146,9 +146,9 @@ r.post('/upload-item', (req, res) => {
         const itemID = rows.rows[0].id;
 
         client.query(
-          `insert into item_images (src, itemID)
-           values ($1, $2)`,
-           [image, itemID], (err, rows) => {
+          `insert into item_attributes (src, item_id, tags)
+           values ($1, $2, $3)`,
+           [src, itemID, tags], (err, rows) => {
             done();
             if (err) {
               console.log(err.stack);

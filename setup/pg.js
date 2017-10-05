@@ -24,7 +24,6 @@ module.exports = () => {
       unique (email)
     );
   `)
-    .then(() => null)
     .catch(e => console.error(e.stack))
     .then(() => {
       client.query(`
@@ -32,25 +31,23 @@ module.exports = () => {
           id serial primary key not null,
           name     text    not null,
           price    int     not null,
-          onsale   boolean not null default true,
-          ownerID  int     not null,
           quantity int     not null,
-          tags     text[]
+          owner_id int     not null
         );
       `)
-      .then(() => null)
       .catch(e => console.error(e.stack));
     })
     .catch(e => console.log(e))
     .then(() => {
       client.query(`
-        create table if not exists item_images(
+        create table if not exists item_attributes(
           id serial primary key not null,
-          src    text not null,
-          itemID int  not null
+          src      text    not null,
+          item_id   int     not null,
+          add_time timestamp default now(),
+          tags   text[]
         );
       `)
-      .then(() => null)
       .catch(e => console.error(e.stack));
     })
     .catch(e => console.log(e));

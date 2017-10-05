@@ -13,9 +13,9 @@ export default class AddProduct extends Component {
     let price = document.getElementById('price').value;
     let quantity = document.getElementById('quantity').value;
     const tags = document.getElementById('tags').value.split(',');
-    const image = document.getElementById('image').value;
+    const src = document.getElementById('image_src').value;
 
-    if (name.length > 0 && price.length > 0 && quantity.length > 0 && image.length > 0) {
+    if (name.length > 0 && price.length > 0 && quantity.length > 0 && src.length > 0) {
       price = parseInt(price);
       quantity = parseInt(quantity);
 
@@ -25,7 +25,7 @@ export default class AddProduct extends Component {
       }
 
       axios.post('/upload-item', {
-        name, price, quantity, tags, image,
+        name, price, quantity, tags, src,
       }, {
         headers: { Authorization: localStorage.getItem('token') },
       }
@@ -55,8 +55,8 @@ export default class AddProduct extends Component {
           <input type="text" placeholder="Quantity" id="quantity"/>
           <label htmlFor="tags">Tags are separeted by comma ','</label>
           <input type="text" placeholder="Tags" id="tags"/>
-          <label htmlFor="image">Image</label>
-          <input type="text" placeholder="Image Source" id="image"/>
+          <label htmlFor="image_src">Image</label>
+          <input type="text" placeholder="Image Source" id="image_src"/>
           <input
             onClick={this.upload}
             type="button"
