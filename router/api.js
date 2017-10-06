@@ -1,7 +1,7 @@
 const r = require('express').Router();
 const { Pool } = require('pg');
 const jwt = require('jsonwebtoken');
-const returnID = require('./returnID');
+const verifyToken = require('./verifyToken');
 
 const pool = new Pool({
   user: process.env.dbname,
@@ -29,7 +29,7 @@ r.get('/auth', (req, res) => {
 });
 
 r.get('/myproducts', (req, res) => {
-  const id = returnID(req);
+  const id = verifyToken(req);
 
   if (id === null) {
     res.status(401).json({ msg: 'You are not authorized.' });
@@ -57,7 +57,7 @@ r.get('/myproducts', (req, res) => {
 });
 
 r.get('/allproducts', (req, res) => {
-  const id = returnID(req);
+  const id = verifyToken(req);
 
   if (id === null) {
     res.status(401).json({ msg: 'You are not authorized.' });
@@ -69,7 +69,7 @@ r.get('/allproducts', (req, res) => {
     client.query(`
           select i.name, i.price, i.id, a.src
           from items i, item_attributes a
-          where (i.owner_id != $1 and a.item_id = i.id)
+          where (i.quantity > 0 and i.owner_id != $1 and a.item_id = i.id)
           `,
        [id], (err, rows) => {
         done();

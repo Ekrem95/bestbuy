@@ -43,9 +43,22 @@ module.exports = () => {
         create table if not exists item_attributes(
           id serial primary key not null,
           src      text    not null,
-          item_id   int     not null,
+          item_id  int     not null,
           add_time timestamp default now(),
-          tags   text[]
+          tags text[]
+        );
+      `)
+      .catch(e => console.error(e.stack));
+    })
+    .catch(e => console.log(e))
+    .then(() => {
+      client.query(`
+        create table if not exists transactions(
+          id serial primary key not null,
+          sender   text    not null,
+          receiver text    not null,
+          quantity int     not null default 1,
+          time timestamp default now()
         );
       `)
       .catch(e => console.error(e.stack));

@@ -3,6 +3,7 @@ const path = require('path');
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const verifyToken = require('./verifyToken');
 
 const pool = new Pool({
   user: process.env.dbname,
@@ -154,6 +155,67 @@ r.post('/upload-item', (req, res) => {
           `insert into item_attributes (src, item_id, tags)
            values ($1, $2, $3)`,
            [src, itemID, tags], (err, rows) => {
+            done();
+            if (err) {
+              console.log(err.stack);
+              res.status(500).json({ msg: 'Internal Server Error.' });
+              return;
+            }
+
+            res.status(200).send();
+          });
+      });
+    });
+  });
+});
+
+r.post('/buy-product', (req, res) => {
+  const userID = verifyToken(req);
+  if (userID === null) {
+    res.status(401).json({ msg: 'You are not authorized.' });
+    return;
+  }
+
+  const { id } = req.body; // product ID
+
+  pool.connect((err, client, done) => {
+    if (err) throw err;
+    client.query(
+      `update items
+        set quantity = quantity - 1
+        where id = $1
+        returning owner_id, price`,
+       [id], (err, rows) => {
+      if (err) {
+        done();
+        console.log(err.stack);
+        res.status(500).json({ msg: 'Internal Server Error.' });
+        return;
+      }
+
+      const senderID = rows.rows[0].owner_id;
+      const price = rows.rows[0].price;
+
+      client.query(
+        `update users
+          set balance =
+          case when id=$1 then balance - $2
+               when id=$3 then balance + $2
+          else balance end
+          where id=$1 or id=$3`,
+         [userID, price, senderID], (err, rows) => {
+        if (err) {
+          done();
+          console.log(err.stack);
+          res.status(500).json({ msg: 'Internal Server Error.' });
+          return;
+        }
+
+        client.query(
+          `insert into transactions
+            (sender, receiver)
+            values ($1, $2)`,
+           [senderID, userID], (err, rows) => {
             done();
             if (err) {
               console.log(err.stack);

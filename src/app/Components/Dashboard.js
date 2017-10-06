@@ -8,6 +8,7 @@ export default class Dashboard extends Component {
   constructor() {
     super();
     this.state = { items: null, selected: null };
+    this.fade = this.fade.bind(this);
   }
 
   componentWillMount() {
@@ -21,6 +22,21 @@ export default class Dashboard extends Component {
         .catch(e => console.log(e.response.status));
       }
     });
+  }
+
+  fade() {
+    const popup = document.getElementById('popup');
+    popup.style.opacity = 1;
+    (function move() {
+        popup.style.opacity -= 0.1;
+        if (popup.style.opacity < 0.1) {
+          popup.style.display = 'none';
+          popup.style.opacity = 1;
+          return;
+        }
+
+        setTimeout(move, 50);
+      })();
   }
 
   render() {
@@ -60,23 +76,18 @@ export default class Dashboard extends Component {
              onAccept={() => {
               const { id } = this.state.selected;
 
-              axios.post('/buy-product', {
+              axios.post('/buy-product', { id }, {
                 headers: { Authorization: localStorage.getItem('token') },
-              }, {
-                id,
-              })
-              .then(res => {
-                console.log(res);
+              },
+            ).then(res => {
+                this.fade();
               })
               .catch(error => {
                 this.setState({ msg: error.response.status });
               });
             }}
 
-             onCancel={() => {
-              const popup = document.getElementById('popup');
-              popup.style.display = 'none';
-            }}
+             onCancel={this.fade}
 
            />
         </div>
