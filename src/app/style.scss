@@ -193,4 +193,65 @@ html, body {
       }
     }
   }
+
+  #popup {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    position: absolute;
+    background: #000;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 6px;
+    display: none;
+
+    div {
+      margin: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+      width: 250px;
+      border: solid 2px rgb(48, 30, 45);
+
+      animation: fadein 1s;
+
+      h4 {
+        max-width: 200px;
+        margin: 5px;
+      }
+
+      img {
+        width: 200px;
+        max-height: 250px;
+        object-fit: cover;
+      }
+
+      span {
+        margin: 10px;
+      }
+    }
+
+    #decision {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      height: 60px;
+
+      span {
+        width: 50%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 5px;
+        cursor: pointer;
+
+        &:hover {
+          background: rgb(26, 27, 24);
+        }
+      }
+    }
+  }
 }

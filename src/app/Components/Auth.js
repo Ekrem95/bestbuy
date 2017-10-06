@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { validateEmail } from '../JS/helpers';
 import axios from 'axios';
+import { store } from '../JS/reducer';
+import { AUTH } from '../JS/actions';
 
 export default class Auth extends Component {
   constructor(props) {
@@ -48,6 +50,7 @@ export default class Auth extends Component {
       })
       .then(res => {
         localStorage.setItem('token', res.data.token);
+        store.dispatch({ type: AUTH });
         this.props.history.push('/');
       })
       .catch(error => {
