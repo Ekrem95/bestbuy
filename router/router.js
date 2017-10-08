@@ -213,9 +213,9 @@ r.post('/buy-product', (req, res) => {
 
         client.query(
           `insert into transactions
-            (sender, receiver)
-            values ($1, $2)`,
-           [senderID, userID], (err, rows) => {
+            (sender, receiver, item_id)
+            values ($1, $2, $3)`,
+           [senderID, userID, id], (err, rows) => {
             done();
             if (err) {
               console.log(err.stack);

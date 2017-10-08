@@ -3,8 +3,8 @@ import axios from 'axios';
 import { checkAuth } from '../JS/helpers';
 
 export default class AddProduct extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.upload = this.upload.bind(this);
     this.state = { msg: null };
   }

@@ -5,8 +5,8 @@ import List from '../JS/List';
 import Popup from '../JS/Popup';
 
 export default class Dashboard extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = { items: null, selected: null };
     this.fade = this.fade.bind(this);
   }
@@ -42,7 +42,6 @@ export default class Dashboard extends Component {
   render() {
     return (
       <div>
-        <div>Dashboard</div>
         <div id="lists">
           {this.state.items &&
             this.state.items.map(i =>

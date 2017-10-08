@@ -3,8 +3,8 @@ import axios from 'axios';
 import { checkAuth } from '../JS/helpers';
 
 export default class MyProducts extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = { items: null };
   }
 

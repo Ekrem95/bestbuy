@@ -7,6 +7,7 @@ import Auth from './Components/Auth';
 import Nav from './Components/Nav';
 import AddProduct from './Components/AddProduct';
 import MyProducts from './Components/MyProducts';
+import History from './Components/History';
 
 import style from './style.scss';
 
@@ -21,6 +22,7 @@ class App extends Component {
             <Route path="/auth" component={Auth}/>
             <Route path="/addproduct" component={AddProduct}/>
             <Route path="/myproducts" component={MyProducts}/>
+            <Route path="/transactions" component={History}/>
           </Switch>
         </div>
       </BrowserRouter>

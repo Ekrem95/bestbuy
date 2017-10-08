@@ -6,8 +6,8 @@ import { AUTH, UNAUTH } from '../JS/actions';
 import { checkAuth } from '../JS/helpers';
 
 export default class Nav extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = { loggedIn: Boolean };
   }
 
@@ -46,8 +46,12 @@ export default class Nav extends Component {
           <div>
           <div className="links">
             <Link to="/">Home</Link>
-            <Link to="/addproduct">Add Product</Link>
-            <Link to="/myproducts">My Products</Link>
+            <div className="dropdown">
+              Links
+              <Link to="/addproduct">Add Product</Link>
+              <Link to="/myproducts">My Products</Link>
+              <Link to="/transactions">History</Link>
+            </div>
             <span
               onClick={() => {
                 axios.post('/logout')

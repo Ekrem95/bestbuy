@@ -55,8 +55,9 @@ module.exports = () => {
       client.query(`
         create table if not exists transactions(
           id serial primary key not null,
-          sender   text    not null,
-          receiver text    not null,
+          sender   int     not null,
+          receiver int     not null,
+          item_id  int     not null,
           quantity int     not null default 1,
           time timestamp default now()
         );
