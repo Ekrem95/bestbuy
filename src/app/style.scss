@@ -15,6 +15,12 @@ html, body {
   color: #eee;
   font-size: 16px;
   margin: 0;
+  overflow-x: hidden;
+
+  input#search {
+    margin-left: 50%;
+    transform: translate(-50%);
+  }
 
   #auth {
     @include column;

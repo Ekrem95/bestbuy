@@ -91,6 +91,33 @@ r.get('/transactions', (req, res) => {
   });
 });
 
+r.get('/searchitems/:name', (req, res) => {
+  const name = req.params.name.toLowerCase();
+
+  pool.connect((err, client, done) => {
+    if (err) throw err;
+    client.query(`
+          select i.name, i.price, i.id, a.src
+          from items i, item_attributes a
+          where (
+            lower(i.name) like '%' || $1 || '%'
+            and
+            i.id = a.item_id
+          )
+          `,
+       [name], (err, rows) => {
+        done();
+        if (err) {
+          console.log(err.stack);
+          res.status(500).json({ msg: 'Internal Server Error.' });
+          return;
+        }
+
+        res.status(200).json({ items: rows.rows });
+      });
+  });
+});
+
 r.get('/allproducts', (req, res) => {
   const id = verifyToken(req);
 

@@ -9,12 +9,13 @@ export default class Dashboard extends Component {
     super(props);
     this.state = { items: null, selected: null };
     this.fade = this.fade.bind(this);
+    this.defaultFetchURL = '/api/allproducts';
   }
 
   componentWillMount() {
     checkAuth(this).then(loggedIn => {
       if (loggedIn) {
-        axios.get('/api/allproducts', {
+        axios.get(this.defaultFetchURL, {
           headers: { Authorization: localStorage.getItem('token') },
         }).then(res => {
           this.setState({ items: res.data.items });
@@ -42,6 +43,29 @@ export default class Dashboard extends Component {
   render() {
     return (
       <div>
+        <input
+          id="search"
+          onChange={(e) => {
+            if (e.target.value.length === 0) {
+              axios.get(this.defaultFetchURL, {
+                headers: { Authorization: localStorage.getItem('token') },
+              })
+              .then(res => {
+                this.setState({ items: res.data.items });
+              });
+            }
+          }}
+
+          onKeyUp={(e) => {
+            if (e.keyCode === 13 && e.target.value.length > 0) {
+              axios.get('/api/searchitems/' + e.target.value)
+              .then(res => {
+                this.setState({ items: res.data.items });
+              });
+            }
+          }}
+
+        />
         <div id="lists">
           {this.state.items &&
             this.state.items.map(i =>
