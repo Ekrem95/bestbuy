@@ -33,6 +33,11 @@ app.use('/', require('./router/router'));
 const port = process.env.PORT || 3000;
 
 require('./setup')();
-app.listen(port, () => {
-  console.log(`Listening on port: ${port}`);
-});
+
+if (!module.parent) {
+  app.listen(port, () => {
+    console.log(`Listening on port: ${port}`);
+  });
+}
+
+module.exports = app;

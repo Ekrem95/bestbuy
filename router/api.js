@@ -20,11 +20,11 @@ r.get('/auth', (req, res) => {
   const token = req.get('Authorization');
   jwt.verify(token, process.env.token, function (err, decoded) {
     if (decoded === undefined) {
-      res.json({ access: false });
+      res.status(401).json({ access: false });
       return;
     }
 
-    res.json({ access: true });
+    res.status(200).json({ access: true });
   });
 });
 

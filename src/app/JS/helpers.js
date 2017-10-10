@@ -15,14 +15,14 @@ export const checkAuth = (component) =>
         headers: { Authorization: localStorage.getItem('token') },
       })
       .then(res => {
-        if (res.data.access === false) {
+        resolve(true);
+      })
+      .catch(e => {
+        if (e.response.data.access === false) {
           localStorage.removeItem('token');
           component.props.history.push('/auth');
           resolve(false);
         }
-
-        resolve(true);
-      })
-      .catch(e => console.log(e));
+      });
     }
   });
