@@ -1,6 +1,28 @@
-const request = require('supertest');
 const app = require('../../server');
 const jwt = require('jsonwebtoken');
+const request = require('supertest');
+
+const pool = require('../../router/router').db;
+
+const user = {
+      name: 'testuser', email: 'test@user.com', password: 'password',
+    };
+
+beforeAll(() => {
+  pool.connect((err, client, done) => {
+    if (err) throw err;
+    client.query(
+      'delete from users where email = $1',
+      [user.email], (err, rows) => {
+      done();
+
+      if (err) {
+        console.log(err.stack);
+        return;
+      }
+    });
+  });
+});
 
 test('sends html', () => {
   request(app)
@@ -49,16 +71,70 @@ test('logout', () => {
     });
 });
 
-// test('succesful signup', () => {
-//   request(app)
-//     .post('/signup')
-//     // .send({ name: 'testuser' })
-//
-//     // .expect('Content-Type', /json/)
-//     // .expect('Content-Length', '16')
-//     // .expect(200)
-//     .end(function (err, res) {
-//       console.log(res.body, res.statusCode);
-//       if (err) throw err;
-//     });
-// });
+describe('Post requests', async () => {
+  it('succesful signup', async (done) => {
+    request(app)
+      .post('/signup')
+      .send(user)
+      .end(function (err, res) {
+        expect(res.status).toEqual(200);
+        done();
+      });
+  });
+
+  it('unsuccesful signup (duplicate)', async (done) => {
+    request(app)
+      .post('/signup')
+      .send(user)
+      .end(function (err, res) {
+        expect(res.status).toEqual(401);
+        done();
+      });
+  });
+
+  it('unsuccesful signup (email empty)', async (done) => {
+    request(app)
+      .post('/signup')
+      .send(Object.assign({}, user, { email: '' }))
+      .end(function (err, res) {
+        expect(res.status).toEqual(400);
+        done();
+      });
+  });
+
+  it('succesful login', async (done) => {
+    request(app)
+      .post('/login')
+      .send({ email: user.email, password: user.password })
+      .end(function (err, res) {
+        expect(res.status).toEqual(200);
+        done();
+      });
+  });
+
+  it('unsuccesful login wrong password', async (done) => {
+    request(app)
+      .post('/login')
+      .send({
+        email: user.email,
+        password: user.password.split('').reverse().join(''),
+      })
+      .end(function (err, res) {
+        expect(res.status).toEqual(401);
+        done();
+      });
+  });
+
+  it('unsuccesful login (password empty)', async (done) => {
+    request(app)
+      .post('/login')
+      .send({
+        email: user.email,
+        password: '',
+      })
+      .end(function (err, res) {
+        expect(res.status).toEqual(400);
+        done();
+      });
+  });
+});

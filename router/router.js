@@ -27,6 +27,10 @@ r.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../src/public', 'index.html'));
 });
 
+r.post('/test', (req, res) => {
+  res.status(200).json({ data: req.body });
+});
+
 r.post('/logout', (req, res) => {
   req.session.destroy();
   res.status(200).send();
@@ -242,3 +246,4 @@ r.post('/buy-product', (req, res) => {
 });
 
 module.exports = r;
+module.exports.db = pool;
