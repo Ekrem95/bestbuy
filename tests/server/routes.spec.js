@@ -39,3 +39,26 @@ test('check auth endpoint with token', () => {
       if (err) throw err;
     });
 });
+
+test('logout', () => {
+  request(app)
+    .post('/logout')
+    .expect(200)
+    .end(function (err, res) {
+      if (err) throw err;
+    });
+});
+
+// test('succesful signup', () => {
+//   request(app)
+//     .post('/signup')
+//     // .send({ name: 'testuser' })
+//
+//     // .expect('Content-Type', /json/)
+//     // .expect('Content-Length', '16')
+//     // .expect(200)
+//     .end(function (err, res) {
+//       console.log(res.body, res.statusCode);
+//       if (err) throw err;
+//     });
+// });

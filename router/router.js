@@ -33,7 +33,14 @@ r.post('/logout', (req, res) => {
 });
 
 r.post('/login', (req, res) => {
-  if (req.body.email.length < 5 || req.body.password.length < 6) {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    res.status(400).json({ msg: 'Bad Request' });
+    return;
+  }
+
+  if (email.length < 5 || password.length < 6) {
     res.status(400).json({ msg: 'Bad Request' });
     return;
   }
@@ -42,7 +49,7 @@ r.post('/login', (req, res) => {
     if (err) throw err;
     client.query(
       'SELECT id, password FROM users WHERE email = $1 limit 1',
-      [req.body.email], (err, rows) => {
+      [email], (err, rows) => {
       done();
 
       if (err) {
@@ -56,7 +63,7 @@ r.post('/login', (req, res) => {
       }
 
       const hash = rows.rows[0].password;
-      const match = bcrypt.compareSync(req.body.password, hash);
+      const match = bcrypt.compareSync(password, hash);
 
       if (match === false) {
         res.status(401).json({ msg: 'Wrong email & password combination.' });
@@ -75,9 +82,14 @@ r.post('/login', (req, res) => {
 });
 
 r.post('/signup', (req, res) => {
-  if (req.body.name.length < 1 ||
-      req.body.email.length < 5 ||
-      req.body.password.length < 6) {
+  const { name, email, password } = req.body;
+
+  if (!name || !email || !password) {
+    res.status(400).json({ msg: 'Bad Request' });
+    return;
+  }
+
+  if (name.length < 1 || email.length < 5 || password.length < 6) {
     res.status(400).json({ msg: 'Bad Request' });
     return;
   }
@@ -85,7 +97,7 @@ r.post('/signup', (req, res) => {
   pool.connect((err, client, done) => {
     if (err) throw err;
     client.query(
-      'SELECT FROM users WHERE email = $1 limit 1', [req.body.email], (err, rows) => {
+      'SELECT FROM users WHERE email = $1 limit 1', [email], (err, rows) => {
       if (err) {
         done();
         console.log(err.stack);
@@ -100,12 +112,11 @@ r.post('/signup', (req, res) => {
       }
 
       const salt = bcrypt.genSaltSync(10);
-      const hash = bcrypt.hashSync(req.body.password, salt);
-      delete req.body.password;
+      const hash = bcrypt.hashSync(password, salt);
 
       client.query(
         'insert into users (name, email, password) values ($1, $2, $3) returning id',
-        [req.body.name, req.body.email, hash], (err, rows) => {
+        [name, email, hash], (err, rows) => {
         done();
         if (err) {
           console.log(err.stack);
