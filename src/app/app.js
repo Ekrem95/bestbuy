@@ -8,6 +8,7 @@ import Nav from './Components/Nav';
 import AddProduct from './Components/AddProduct';
 import MyProducts from './Components/MyProducts';
 import History from './Components/History';
+import Search from './Components/Search';
 
 import style from './style.scss';
 
@@ -23,6 +24,7 @@ class App extends Component {
             <Route path="/addproduct" component={AddProduct}/>
             <Route path="/myproducts" component={MyProducts}/>
             <Route path="/transactions" component={History}/>
+            <Route path="/search" component={Search}/>
           </Switch>
         </div>
       </BrowserRouter>

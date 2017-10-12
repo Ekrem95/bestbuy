@@ -51,6 +51,7 @@ export default class Nav extends Component {
               <Link to="/addproduct">Add Product</Link>
               <Link to="/myproducts">My Products</Link>
               <Link to="/transactions">History</Link>
+              <Link to="/search">Search</Link>
             </div>
             <span
               onClick={() => {

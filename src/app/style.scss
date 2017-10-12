@@ -203,6 +203,36 @@ html, body {
     }
   }
 
+  #tags {
+
+    #buttons {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      width: 90vw;
+
+      input[type="button"] {
+        margin: 5px;
+        width: 90px;
+        height: 25px;
+        background: rgb(48, 149, 94);
+        color: #eee;
+        border: none;
+        border-radius: 2px;
+        cursor: pointer;
+
+        &:hover {
+          background: rgb(28, 128, 73);
+        }
+
+        &.selected {
+          background: rgb(38, 43, 38);
+          color: #eee;
+        }
+      }
+    }
+  }
+
   #lists {
     display: flex;
     flex-direction: row;

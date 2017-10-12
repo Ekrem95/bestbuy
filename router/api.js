@@ -146,4 +146,51 @@ r.get('/allproducts', (req, res) => {
   });
 });
 
+r.get('/tags', (req, res) => {
+  pool.connect((err, client, done) => {
+    if (err) throw err;
+    client.query(`
+          select tags
+          from item_attributes
+          group by 1
+          `,
+       [], (err, rows) => {
+        done();
+        if (err) {
+          console.log(err.stack);
+          res.status(500).json({ msg: 'Internal Server Error.' });
+          return;
+        }
+
+        res.status(200).json({ items: rows.rows });
+      });
+  });
+});
+
+r.post('/getbytags', (req, res) => {
+  const { selected } = req.body;
+
+  pool.connect((err, client, done) => {
+    if (err) throw err;
+    client.query(`
+          select i.name, i.price, i.id, a.src, a.tags
+          from items i, item_attributes a
+          where (
+            $1 @> a.tags and
+            i.quantity > 0 and a.item_id = i.id
+          )
+          `,
+       [selected], (err, rows) => {
+        done();
+        if (err) {
+          console.log(err.stack);
+          res.status(500).json({ msg: 'Internal Server Error.' });
+          return;
+        }
+
+        res.status(200).json({ items: rows.rows });
+      });
+  });
+});
+
 module.exports = r;

@@ -92,7 +92,7 @@ describe('Post requests', async () => {
       });
   });
 
-  it('unsuccesful signup (email empty)', async (done) => {
+  it('unsuccesful signup (empty email)', async (done) => {
     request(app)
       .post('/signup')
       .send(Object.assign({}, user, { email: '' }))
@@ -125,7 +125,7 @@ describe('Post requests', async () => {
       });
   });
 
-  it('unsuccesful login (password empty)', async (done) => {
+  it('unsuccesful login (empty password)', async (done) => {
     request(app)
       .post('/login')
       .send({
