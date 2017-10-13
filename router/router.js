@@ -151,6 +151,11 @@ r.post('/upload-item', (req, res) => {
 
     const { name, price, quantity, tags, src } = req.body;
 
+    if (!name || !price || !quantity || !src) {
+      res.status(400).json({ msg: 'Bad Request.' });
+      return;
+    }
+
     pool.connect((err, client, done) => {
       if (err) throw err;
       client.query(
@@ -166,19 +171,35 @@ r.post('/upload-item', (req, res) => {
 
         const itemID = rows.rows[0].id;
 
-        client.query(
-          `insert into item_attributes (src, item_id, tags)
-           values ($1, $2, $3)`,
-           [src, itemID, tags], (err, rows) => {
-            done();
-            if (err) {
-              console.log(err.stack);
-              res.status(500).json({ msg: 'Internal Server Error.' });
-              return;
-            }
+        if (tags === null || tags === undefined) {
+          client.query(
+            `insert into item_attributes (src, item_id)
+             values ($1, $2)`,
+             [src, itemID], (err, rows) => {
+              done();
+              if (err) {
+                console.log(err.stack);
+                res.status(500).json({ msg: 'Internal Server Error.' });
+                return;
+              }
 
-            res.status(200).send();
-          });
+              res.status(200).send();
+            });
+        } else {
+          client.query(
+            `insert into item_attributes (src, item_id, tags)
+             values ($1, $2, $3)`,
+             [src, itemID, tags], (err, rows) => {
+              done();
+              if (err) {
+                console.log(err.stack);
+                res.status(500).json({ msg: 'Internal Server Error.' });
+                return;
+              }
+
+              res.status(200).send();
+            });
+        }
       });
     });
   });

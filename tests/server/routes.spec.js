@@ -3,25 +3,17 @@ const jwt = require('jsonwebtoken');
 const request = require('supertest');
 
 const pool = require('../../router/router').db;
+const clear = require('../setup/clear-db');
+const { user, item } = require('../setup/static');
 
-const user = {
-      name: 'testuser', email: 'test@user.com', password: 'password',
-    };
+let token;
 
 beforeAll(() => {
-  pool.connect((err, client, done) => {
-    if (err) throw err;
-    client.query(
-      'delete from users where email = $1',
-      [user.email], (err, rows) => {
-      done();
+  clear();
+});
 
-      if (err) {
-        console.log(err.stack);
-        return;
-      }
-    });
-  });
+beforeEach(() => {
+
 });
 
 test('sends html', () => {
@@ -71,70 +63,82 @@ test('logout', () => {
     });
 });
 
-describe('Post requests', async () => {
-  it('succesful signup', async (done) => {
-    request(app)
-      .post('/signup')
-      .send(user)
-      .end(function (err, res) {
-        expect(res.status).toEqual(200);
-        done();
-      });
-  });
+test('succesful signup', async (done) => {
+  request(app)
+    .post('/signup')
+    .send(user)
+    .end(function (err, res) {
+      expect(res.status).toEqual(200);
+      done();
+    });
+});
 
-  it('unsuccesful signup (duplicate)', async (done) => {
-    request(app)
-      .post('/signup')
-      .send(user)
-      .end(function (err, res) {
-        expect(res.status).toEqual(401);
-        done();
-      });
-  });
+test('unsuccesful signup (duplicate)', async (done) => {
+  request(app)
+    .post('/signup')
+    .send(user)
+    .end(function (err, res) {
+      expect(res.status).toEqual(401);
+      done();
+    });
+});
 
-  it('unsuccesful signup (empty email)', async (done) => {
-    request(app)
-      .post('/signup')
-      .send(Object.assign({}, user, { email: '' }))
-      .end(function (err, res) {
-        expect(res.status).toEqual(400);
-        done();
-      });
-  });
+test('unsuccesful signup (empty email)', async (done) => {
+  request(app)
+    .post('/signup')
+    .send(Object.assign({}, user, { email: '' }))
+    .end(function (err, res) {
+      expect(res.status).toEqual(400);
+      done();
+    });
+});
 
-  it('succesful login', async (done) => {
-    request(app)
-      .post('/login')
-      .send({ email: user.email, password: user.password })
-      .end(function (err, res) {
-        expect(res.status).toEqual(200);
-        done();
-      });
-  });
+test('succesful login', async (done) => {
+  request(app)
+    .post('/login')
+    .send({ email: user.email, password: user.password })
+    .end(function (err, res) {
+      expect(res.status).toEqual(200);
+      token = res.body.token;
+      done();
+    });
+});
 
-  it('unsuccesful login wrong password', async (done) => {
-    request(app)
-      .post('/login')
-      .send({
-        email: user.email,
-        password: user.password.split('').reverse().join(''),
-      })
-      .end(function (err, res) {
-        expect(res.status).toEqual(401);
-        done();
-      });
-  });
+test('unsuccesful login wrong password', async (done) => {
+  request(app)
+    .post('/login')
+    .send({
+      email: user.email,
+      password: user.password.split('').reverse().join(''),
+    })
+    .end(function (err, res) {
+      expect(res.status).toEqual(401);
+      done();
+    });
+});
 
-  it('unsuccesful login (empty password)', async (done) => {
-    request(app)
-      .post('/login')
-      .send({
-        email: user.email,
-        password: '',
-      })
-      .end(function (err, res) {
-        expect(res.status).toEqual(400);
-        done();
-      });
-  });
+test('unsuccesful login (empty password)', async (done) => {
+  request(app)
+    .post('/login')
+    .send({
+      email: user.email,
+      password: '',
+    })
+    .end(function (err, res) {
+      expect(res.status).toEqual(400);
+      done();
+    });
+});
+
+test('upload item', async (done) => {
+  request(app)
+    .post('/upload-item')
+    .send(item)
+    .set('Authorization', token)
+    .expect(200)
+    .end(function (err, res) {
+      // expect(res.status).toEqual(400);
+      if (err) throw err;
+      done();
+    });
 });
