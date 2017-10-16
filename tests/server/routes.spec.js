@@ -63,7 +63,7 @@ test('logout', () => {
     });
 });
 
-test('succesful signup', async (done) => {
+test('succesful signup', (done) => {
   request(app)
     .post('/signup')
     .send(user)
@@ -73,7 +73,7 @@ test('succesful signup', async (done) => {
     });
 });
 
-test('unsuccesful signup (duplicate)', async (done) => {
+test('unsuccesful signup (duplicate)', (done) => {
   request(app)
     .post('/signup')
     .send(user)
@@ -83,7 +83,7 @@ test('unsuccesful signup (duplicate)', async (done) => {
     });
 });
 
-test('unsuccesful signup (empty email)', async (done) => {
+test('unsuccesful signup (empty email)', (done) => {
   request(app)
     .post('/signup')
     .send(Object.assign({}, user, { email: '' }))
@@ -93,7 +93,7 @@ test('unsuccesful signup (empty email)', async (done) => {
     });
 });
 
-test('succesful login', async (done) => {
+test('succesful login', (done) => {
   request(app)
     .post('/login')
     .send({ email: user.email, password: user.password })
@@ -104,7 +104,7 @@ test('succesful login', async (done) => {
     });
 });
 
-test('unsuccesful login wrong password', async (done) => {
+test('unsuccesful login wrong password', (done) => {
   request(app)
     .post('/login')
     .send({
@@ -117,7 +117,7 @@ test('unsuccesful login wrong password', async (done) => {
     });
 });
 
-test('unsuccesful login (empty password)', async (done) => {
+test('unsuccesful login (empty password)', (done) => {
   request(app)
     .post('/login')
     .send({
@@ -130,7 +130,7 @@ test('unsuccesful login (empty password)', async (done) => {
     });
 });
 
-test('upload item', async (done) => {
+test('upload item', (done) => {
   request(app)
     .post('/upload-item')
     .send(item)
@@ -141,4 +141,56 @@ test('upload item', async (done) => {
       if (err) throw err;
       done();
     });
+});
+
+test('upload item with empty field (name)', (done) => {
+  request(app)
+    .post('/upload-item')
+    .send(Object.assign({}, item, { name: '' }))
+    .set('Authorization', token)
+    .expect(400)
+    .end(function (err, res) {
+      // expect(res.status).toEqual(400);
+      if (err) throw err;
+      done();
+    });
+});
+
+test('buy product', (fin) => {
+  pool.connect((err, client, done) => {
+      if (err) throw err;
+      client.query(
+        'select id from items where name = $1',
+        [item.name], (err, rows) => {
+        if (err) {
+          done();
+          console.log(err.stack);
+          return;
+        }
+
+        const itemID = rows.rows[0].id;
+
+        request(app)
+          .post('/buy-product')
+          .send({ id: itemID })
+          .set('Authorization', token)
+          .expect(200)
+          .end(function (err, res) {
+            // expect(res.status).toEqual(400);
+            if (err) throw err;
+
+            client.query(
+              'delete from transactions where item_id = $1',
+              [itemID], (err, rows) => {
+                done();
+                if (err) {
+                  console.log(err.stack);
+                  return;
+                }
+              });
+          });
+      });
+    });
+
+  fin();
 });
